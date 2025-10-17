@@ -1,3 +1,4 @@
+using Commands;
 using UnityEngine;
 
 public class SpawnObjectsScript : MonoBehaviour
@@ -39,6 +40,9 @@ public class SpawnObjectsScript : MonoBehaviour
 
     void Start()
     {
+            CommandManager.Instance.RegisterInstance(this);
+
+
         timer = 0f;
         spawnedCount = 0;
 
@@ -74,6 +78,7 @@ public class SpawnObjectsScript : MonoBehaviour
         spawnedCount++;
     }
 
+    [Command("spawnBox", "Spawns given amounts of box")]
     public void SpawnMany(int count)
     {
         for (int i = 0; i < count; i++)

@@ -12,12 +12,21 @@ namespace Commands
 {
     public partial class CommandManager : MonoBehaviour
     {
+        public static CommandManager Instance { get; private set; }
+
+
         [SerializeField] private TMP_InputField textField;
         private Dictionary<string, MethodInfo> _commands = new();
+        private Dictionary<Type, object> _instances = new();
         private string _input;
+
+        public void RegisterInstance(object instance)
+        {
+            _instances.Add(instance.GetType(), instance);
+        }
         private void Awake()
         {
-            
+            Instance = this;
             var assemblies = System.AppDomain.CurrentDomain.GetAssemblies();
 
             foreach (var assembly in assemblies) 
@@ -75,7 +84,14 @@ namespace Commands
                 invocationsParams.Add(Convert.ChangeType(parameterTokens[i], parameterInfo.ParameterType));
             }
 
-            methodInfo.Invoke(this, invocationsParams.ToArray());
+            object instance = this;
+
+            if(methodInfo.DeclaringType != null && _instances.ContainsKey(methodInfo.DeclaringType))
+            {
+                instance = this;
+            }
+
+            methodInfo.Invoke(instance, invocationsParams.ToArray());
         }
 
 
